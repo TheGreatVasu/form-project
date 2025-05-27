@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🧩 Multi-Step User Profile Form – MERN Stack
 
 This is a full-stack MERN project built as part of an interview task for the Junior Developer role at Frequent Research. The application is a **multi-step user profile update form** featuring dynamic fields, validations, file uploads, and database integration.
@@ -60,3 +61,7 @@ npm start
    npm start
 
 and live demo link is https://form-project-lovat.vercel.app/
+=======
+# form-project
+A MERN stack multi-step profile form with user input validation, step navigation, and MongoDB integration.
+>>>>>>> 3e0c60d986c75c9126dcaf10d124110dbdc3c50d
