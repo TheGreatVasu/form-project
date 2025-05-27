@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Container, Box, Typography, TextField, Button, Select, MenuItem, FormControl, InputLabel, Avatar, RadioGroup, FormControlLabel, Radio, Checkbox, FormHelperText, CircularProgress, Stepper, Step, StepLabel, Paper } from '@mui/material';
 
 function Step1({ formData, setFormData, nextStep }) {
   const [photo, setPhoto] = useState(formData.photo || null);
@@ -86,63 +87,64 @@ function Step1({ formData, setFormData, nextStep }) {
   };
 
   return (
-    <form onSubmit={handleNext}>
-      <h2>Step 1: Personal Info</h2>
-      <div>
-        <label>Profile Photo (JPG/PNG, ≤2MB):</label><br />
-        <input type="file" accept="image/jpeg,image/png" onChange={handlePhotoChange} />
-        {photoPreview && <div><img src={photoPreview} alt="Preview" style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: '50%' }} /></div>}
-      </div>
-      <div>
-        <label>Username:</label><br />
-        <input
-          type="text"
-          value={username}
-          onChange={e => {
-            setUsername(e.target.value);
-            setUsernameError('');
-          }}
-          onBlur={() => {
-            setTouched(t => ({ ...t, username: true }));
-            setUsernameError(validateUsername(username));
-          }}
-        />
-        {usernameError && <div style={{ color: 'red' }}>{usernameError}</div>}
-      </div>
-      <div>
-        <label>Current Password:</label><br />
-        <input
-          type="password"
-          value={currentPassword}
-          onChange={e => setCurrentPassword(e.target.value)}
-          onBlur={() => setTouched(t => ({ ...t, currentPassword: true }))}
-        />
-        {newPassword && !currentPassword && touched.currentPassword && (
-          <div style={{ color: 'red' }}>Current password required to change password</div>
-        )}
-      </div>
-      <div>
-        <label>New Password:</label><br />
-        <input
-          type="password"
-          value={newPassword}
-          onChange={e => {
-            setNewPassword(e.target.value);
-            validateNewPassword(e.target.value);
-          }}
-          onBlur={() => setTouched(t => ({ ...t, newPassword: true }))}
-        />
-        {newPassword && (
-          <div>
-            <span>Password strength: {passwordStrength}</span>
-          </div>
-        )}
-        {newPasswordError && touched.newPassword && (
-          <div style={{ color: 'red' }}>{newPasswordError}</div>
-        )}
-      </div>
-      <button type="submit">Next</button>
-    </form>
+    <Container maxWidth="sm">
+      <Paper elevation={3} sx={{ mt: 6, p: 4, borderRadius: 3 }}>
+        <Typography variant="h4" gutterBottom>Step 1: Personal Info</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
+          <Button variant="contained" component="label" sx={{ mb: 2 }}>
+            Upload Photo
+            <input type="file" hidden accept="image/jpeg,image/png" onChange={handlePhotoChange} />
+          </Button>
+          {photoPreview && <Avatar src={photoPreview} sx={{ width: 100, height: 100, mb: 2 }} />}
+        </Box>
+        <form onSubmit={handleNext} autoComplete="off">
+          <TextField
+            label="Username"
+            fullWidth
+            margin="normal"
+            value={username}
+            onChange={e => {
+              setUsername(e.target.value);
+              setUsernameError('');
+            }}
+            onBlur={() => {
+              setTouched(t => ({ ...t, username: true }));
+              setUsernameError(validateUsername(username));
+            }}
+            error={!!usernameError}
+            helperText={usernameError}
+          />
+          <TextField
+            label="Current Password"
+            type="password"
+            fullWidth
+            margin="normal"
+            value={currentPassword}
+            onChange={e => setCurrentPassword(e.target.value)}
+            onBlur={() => setTouched(t => ({ ...t, currentPassword: true }))}
+            error={!!(newPassword && !currentPassword && touched.currentPassword)}
+            helperText={newPassword && !currentPassword && touched.currentPassword ? 'Current password required to change password' : ''}
+          />
+          <TextField
+            label="New Password"
+            type="password"
+            fullWidth
+            margin="normal"
+            value={newPassword}
+            onChange={e => {
+              setNewPassword(e.target.value);
+              validateNewPassword(e.target.value);
+            }}
+            onBlur={() => setTouched(t => ({ ...t, newPassword: true }))}
+            error={!!newPasswordError && touched.newPassword}
+            helperText={newPasswordError && touched.newPassword ? newPasswordError : (newPassword ? `Password strength: ${passwordStrength}` : '')}
+          />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+            <Button variant="contained" color="primary" type="submit">Next</Button>
+          </Box>
+        </form>
+      </Paper>
+    </Container>
   );
 }
 
@@ -176,51 +178,58 @@ function Step2({ formData, setFormData, nextStep, prevStep }) {
   };
 
   return (
-    <form onSubmit={handleNext}>
-      <h2>Step 2: Professional Details</h2>
-      <div>
-        <label>Profession:</label><br />
-        <select
-          value={profession}
-          onChange={e => {
-            setProfession(e.target.value);
-            setTouched(t => ({ ...t, profession: true }));
-            if (e.target.value !== 'Entrepreneur') setCompanyName('');
-          }}
-          onBlur={() => setTouched(t => ({ ...t, profession: true }))}
-        >
-          <option value="">Select...</option>
-          <option value="Student">Student</option>
-          <option value="Developer">Developer</option>
-          <option value="Entrepreneur">Entrepreneur</option>
-        </select>
-        {touched.profession && errors.profession && <div style={{ color: 'red' }}>{errors.profession}</div>}
-      </div>
-      {profession === 'Entrepreneur' && (
-        <div>
-          <label>Company Name:</label><br />
-          <input
-            type="text"
-            value={companyName}
-            onChange={e => setCompanyName(e.target.value)}
-            onBlur={() => setTouched(t => ({ ...t, companyName: true }))}
+    <Container maxWidth="sm">
+      <Paper elevation={3} sx={{ mt: 6, p: 4, borderRadius: 3 }}>
+        <Typography variant="h4" gutterBottom>Step 2: Professional Details</Typography>
+        <form onSubmit={handleNext} autoComplete="off">
+          <FormControl fullWidth margin="normal" error={!!(touched.profession && errors.profession)}>
+            <InputLabel>Profession</InputLabel>
+            <Select
+              value={profession}
+              label="Profession"
+              onChange={e => {
+                setProfession(e.target.value);
+                setTouched(t => ({ ...t, profession: true }));
+                if (e.target.value !== 'Entrepreneur') setCompanyName('');
+              }}
+              onBlur={() => setTouched(t => ({ ...t, profession: true }))}
+            >
+              <MenuItem value="">Select...</MenuItem>
+              <MenuItem value="Student">Student</MenuItem>
+              <MenuItem value="Developer">Developer</MenuItem>
+              <MenuItem value="Entrepreneur">Entrepreneur</MenuItem>
+            </Select>
+            {touched.profession && errors.profession && <FormHelperText>{errors.profession}</FormHelperText>}
+          </FormControl>
+          {profession === 'Entrepreneur' && (
+            <TextField
+              label="Company Name"
+              fullWidth
+              margin="normal"
+              value={companyName}
+              onChange={e => setCompanyName(e.target.value)}
+              onBlur={() => setTouched(t => ({ ...t, companyName: true }))}
+              error={!!(touched.companyName && errors.companyName)}
+              helperText={touched.companyName && errors.companyName ? errors.companyName : ''}
+            />
+          )}
+          <TextField
+            label="Address Line 1"
+            fullWidth
+            margin="normal"
+            value={address1}
+            onChange={e => setAddress1(e.target.value)}
+            onBlur={() => setTouched(t => ({ ...t, address1: true }))}
+            error={!!(touched.address1 && errors.address1)}
+            helperText={touched.address1 && errors.address1 ? errors.address1 : ''}
           />
-          {touched.companyName && errors.companyName && <div style={{ color: 'red' }}>{errors.companyName}</div>}
-        </div>
-      )}
-      <div>
-        <label>Address Line 1:</label><br />
-        <input
-          type="text"
-          value={address1}
-          onChange={e => setAddress1(e.target.value)}
-          onBlur={() => setTouched(t => ({ ...t, address1: true }))}
-        />
-        {touched.address1 && errors.address1 && <div style={{ color: 'red' }}>{errors.address1}</div>}
-      </div>
-      <button type="button" onClick={prevStep}>Back</button>
-      <button type="submit">Next</button>
-    </form>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+            <Button variant="outlined" color="primary" onClick={prevStep}>Back</Button>
+            <Button variant="contained" color="primary" type="submit">Next</Button>
+          </Box>
+        </form>
+      </Paper>
+    </Container>
   );
 }
 
@@ -232,6 +241,9 @@ function Step3({ formData, setFormData, nextStep, prevStep }) {
   const [errors, setErrors] = useState({});
   const [plan, setPlan] = useState(formData.plan || 'Basic');
   const [newsletter, setNewsletter] = useState(formData.newsletter !== undefined ? formData.newsletter : true);
+  const [loadingCountries, setLoadingCountries] = useState(false);
+  const [loadingStates, setLoadingStates] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
 
   const API_KEY = 'NHhvOEcyWk50N2Vna3VFTE00bFp3MjFKR0ZEOUhkZlg4RTk1MlJlaA==';
   const API_BASE = 'https://api.countrystatecity.in/v1';
@@ -239,10 +251,12 @@ function Step3({ formData, setFormData, nextStep, prevStep }) {
 
   // Fetch countries on mount
   useEffect(() => {
+    setLoadingCountries(true);
     fetch(`${API_BASE}/countries`, { headers })
       .then(res => res.json())
       .then(setCountries)
-      .catch(() => setCountries([]));
+      .catch(() => setCountries([]))
+      .finally(() => setLoadingCountries(false));
   }, []);
 
   // Fetch states when country changes
@@ -252,10 +266,12 @@ function Step3({ formData, setFormData, nextStep, prevStep }) {
       setCities([]);
       return;
     }
+    setLoadingStates(true);
     fetch(`${API_BASE}/countries/${formData.country}/states`, { headers })
       .then(res => res.json())
       .then(setStates)
-      .catch(() => setStates([]));
+      .catch(() => setStates([]))
+      .finally(() => setLoadingStates(false));
   }, [formData.country]);
 
   // Fetch cities when state changes
@@ -264,10 +280,12 @@ function Step3({ formData, setFormData, nextStep, prevStep }) {
       setCities([]);
       return;
     }
+    setLoadingCities(true);
     fetch(`${API_BASE}/countries/${formData.country}/states/${formData.state}/cities`, { headers })
       .then(res => res.json())
       .then(setCities)
-      .catch(() => setCities([]));
+      .catch(() => setCities([]))
+      .finally(() => setLoadingCities(false));
   }, [formData.country, formData.state]);
 
   const validate = () => {
@@ -295,68 +313,74 @@ function Step3({ formData, setFormData, nextStep, prevStep }) {
   };
 
   return (
-    <form onSubmit={handleNext}>
-      <h2>Step 3: Preferences</h2>
-      <div>
-        <label>Country:</label><br />
-        <select
-          value={formData.country || ''}
-          onChange={e => setFormData({ ...formData, country: e.target.value, state: '', city: '' })}
-        >
-          <option value="">Select...</option>
-          {countries.map(c => (
-            <option key={c.iso2} value={c.iso2}>{c.name}</option>
-          ))}
-        </select>
-        {touched.country && errors.country && <div style={{ color: 'red' }}>{errors.country}</div>}
-      </div>
-      <div>
-        <label>State:</label><br />
-        <select
-          value={formData.state || ''}
-          onChange={e => setFormData({ ...formData, state: e.target.value, city: '' })}
-          disabled={!states.length}
-        >
-          <option value="">Select...</option>
-          {states.map(s => (
-            <option key={s.iso2} value={s.iso2}>{s.name}</option>
-          ))}
-        </select>
-        {touched.state && errors.state && <div style={{ color: 'red' }}>{errors.state}</div>}
-      </div>
-      <div>
-        <label>City:</label><br />
-        <select
-          value={formData.city || ''}
-          onChange={e => setFormData({ ...formData, city: e.target.value })}
-          disabled={!cities.length}
-        >
-          <option value="">Select...</option>
-          {cities.map(c => (
-            <option key={c.id} value={c.name}>{c.name}</option>
-          ))}
-        </select>
-        {touched.city && errors.city && <div style={{ color: 'red' }}>{errors.city}</div>}
-      </div>
-      <div>
-        <label>Subscription Plan:</label><br />
-        <label><input type="radio" name="plan" value="Basic" checked={plan === 'Basic'} onChange={() => setPlan('Basic')} /> Basic</label>
-        <label><input type="radio" name="plan" value="Pro" checked={plan === 'Pro'} onChange={() => setPlan('Pro')} /> Pro</label>
-        <label><input type="radio" name="plan" value="Enterprise" checked={plan === 'Enterprise'} onChange={() => setPlan('Enterprise')} /> Enterprise</label>
-      </div>
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={newsletter}
-            onChange={e => setNewsletter(e.target.checked)}
+    <Container maxWidth="sm">
+      <Paper elevation={3} sx={{ mt: 6, p: 4, borderRadius: 3 }}>
+        <Typography variant="h4" gutterBottom>Step 3: Preferences</Typography>
+        <form onSubmit={handleNext} autoComplete="off">
+          <FormControl fullWidth margin="normal" error={!!(touched.country && errors.country)}>
+            <InputLabel>Country</InputLabel>
+            <Select
+              value={formData.country || ''}
+              label="Country"
+              onChange={e => setFormData({ ...formData, country: e.target.value, state: '', city: '' })}
+            >
+              <MenuItem value="">Select...</MenuItem>
+              {loadingCountries ? <MenuItem disabled><CircularProgress size={20} /></MenuItem> : countries.map(c => (
+                <MenuItem key={c.iso2} value={c.iso2}>{c.name}</MenuItem>
+              ))}
+            </Select>
+            {touched.country && errors.country && <FormHelperText>{errors.country}</FormHelperText>}
+          </FormControl>
+          <FormControl fullWidth margin="normal" error={!!(touched.state && errors.state)}>
+            <InputLabel>State</InputLabel>
+            <Select
+              value={formData.state || ''}
+              label="State"
+              onChange={e => setFormData({ ...formData, state: e.target.value, city: '' })}
+              disabled={!states.length}
+            >
+              <MenuItem value="">Select...</MenuItem>
+              {loadingStates ? <MenuItem disabled><CircularProgress size={20} /></MenuItem> : states.map(s => (
+                <MenuItem key={s.iso2} value={s.iso2}>{s.name}</MenuItem>
+              ))}
+            </Select>
+            {touched.state && errors.state && <FormHelperText>{errors.state}</FormHelperText>}
+          </FormControl>
+          <FormControl fullWidth margin="normal" error={!!(touched.city && errors.city)}>
+            <InputLabel>City</InputLabel>
+            <Select
+              value={formData.city || ''}
+              label="City"
+              onChange={e => setFormData({ ...formData, city: e.target.value })}
+              disabled={!cities.length}
+            >
+              <MenuItem value="">Select...</MenuItem>
+              {loadingCities ? <MenuItem disabled><CircularProgress size={20} /></MenuItem> : cities.map(c => (
+                <MenuItem key={c.id} value={c.name}>{c.name}</MenuItem>
+              ))}
+            </Select>
+            {touched.city && errors.city && <FormHelperText>{errors.city}</FormHelperText>}
+          </FormControl>
+          <FormControl component="fieldset" margin="normal">
+            <Typography variant="subtitle1" sx={{ mt: 2 }}>Subscription Plan:</Typography>
+            <RadioGroup row value={plan} onChange={e => setPlan(e.target.value)}>
+              <FormControlLabel value="Basic" control={<Radio />} label="Basic" />
+              <FormControlLabel value="Pro" control={<Radio />} label="Pro" />
+              <FormControlLabel value="Enterprise" control={<Radio />} label="Enterprise" />
+            </RadioGroup>
+          </FormControl>
+          <FormControlLabel
+            control={<Checkbox checked={newsletter} onChange={e => setNewsletter(e.target.checked)} />}
+            label="Subscribe to newsletter"
+            sx={{ mt: 2 }}
           />
-          Subscribe to newsletter
-        </label>
-      </div>
-      <button type="button" onClick={prevStep}>Back</button>
-      <button type="submit">Next</button>
-    </form>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+            <Button variant="outlined" color="primary" onClick={prevStep}>Back</Button>
+            <Button variant="contained" color="primary" type="submit">Next</Button>
+          </Box>
+        </form>
+      </Paper>
+    </Container>
   );
 }
 
@@ -384,7 +408,6 @@ function ReviewSubmit({ formData, prevStep, handleSubmit }) {
         headers['Content-Type'] = 'application/json';
         body = JSON.stringify(body);
       }
-      // Use relative URL for proxy or absolute for production
       const response = await fetch(
         process.env.NODE_ENV === 'development'
           ? 'http://localhost:5000/submit-profile'
@@ -405,33 +428,48 @@ function ReviewSubmit({ formData, prevStep, handleSubmit }) {
     }
   };
 
-  if (success) return <div><h2>Thank you for submitting!</h2></div>;
+  if (success) return (
+    <Container maxWidth="sm">
+      <Paper elevation={3} sx={{ mt: 8, p: 5, borderRadius: 3, textAlign: 'center' }}>
+        <Typography variant="h4" color="primary" gutterBottom>Thank you for submitting!</Typography>
+        <Typography variant="subtitle1">Your details have been received.</Typography>
+      </Paper>
+    </Container>
+  );
 
   return (
-    <div>
-      <h2>Review & Submit</h2>
-      <div style={{ textAlign: 'left', maxWidth: 400, margin: '0 auto' }}>
-        <h3>Personal Info</h3>
-        {formData.photoPreview && <img src={formData.photoPreview} alt="Profile" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }} />}
-        <div><b>Username:</b> {formData.username}</div>
-        {formData.newPassword && <div><b>Password:</b> (changed)</div>}
-        <h3>Professional Details</h3>
-        <div><b>Profession:</b> {formData.profession}</div>
-        {formData.profession === 'Entrepreneur' && <div><b>Company Name:</b> {formData.companyName}</div>}
-        <div><b>Address Line 1:</b> {formData.address1}</div>
-        <h3>Preferences</h3>
-        <div><b>Country:</b> {formData.country}</div>
-        <div><b>State:</b> {formData.state}</div>
-        <div><b>City:</b> {formData.city}</div>
-        <div><b>Subscription Plan:</b> {formData.plan}</div>
-        <div><b>Newsletter:</b> {formData.newsletter ? 'Yes' : 'No'}</div>
-      </div>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
-      <button onClick={prevStep} disabled={loading}>Back</button>
-      <button onClick={onSubmit} disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>
-    </div>
+    <Container maxWidth="sm">
+      <Paper elevation={3} sx={{ mt: 6, p: 4, borderRadius: 3 }}>
+        <Typography variant="h4" gutterBottom>Review & Submit</Typography>
+        <Box sx={{ textAlign: 'left', maxWidth: 400, margin: '0 auto' }}>
+          <Typography variant="h6" sx={{ mt: 2 }}>Personal Info</Typography>
+          {formData.photoPreview && <Avatar src={formData.photoPreview} sx={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', mb: 2 }} />}
+          <Typography><b>Username:</b> {formData.username}</Typography>
+          {formData.newPassword && <Typography><b>Password:</b> (changed)</Typography>}
+          <Typography variant="h6" sx={{ mt: 2 }}>Professional Details</Typography>
+          <Typography><b>Profession:</b> {formData.profession}</Typography>
+          {formData.profession === 'Entrepreneur' && <Typography><b>Company Name:</b> {formData.companyName}</Typography>}
+          <Typography><b>Address Line 1:</b> {formData.address1}</Typography>
+          <Typography variant="h6" sx={{ mt: 2 }}>Preferences</Typography>
+          <Typography><b>Country:</b> {formData.country}</Typography>
+          <Typography><b>State:</b> {formData.state}</Typography>
+          <Typography><b>City:</b> {formData.city}</Typography>
+          <Typography><b>Subscription Plan:</b> {formData.plan}</Typography>
+          <Typography><b>Newsletter:</b> {formData.newsletter ? 'Yes' : 'No'}</Typography>
+        </Box>
+        {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+          <Button variant="outlined" color="primary" onClick={prevStep} disabled={loading}>Back</Button>
+          <Button variant="contained" color="primary" onClick={onSubmit} disabled={loading}>
+            {loading ? <CircularProgress size={24} /> : 'Submit'}
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 }
+
+const steps = ['Personal Info', 'Professional Details', 'Preferences', 'Review & Submit'];
 
 function App() {
   const [step, setStep] = useState(1);
@@ -443,25 +481,34 @@ function App() {
 
   const handleSubmit = () => {
     setSubmitted(true);
-    // Here you can send formData to the backend
   };
 
-  if (submitted) {
-    return <div><h2>Thank you for submitting!</h2></div>;
-  }
-
-  switch (step) {
-    case 1:
-      return <Step1 formData={formData} setFormData={setFormData} nextStep={nextStep} />;
-    case 2:
-      return <Step2 formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />;
-    case 3:
-      return <Step3 formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />;
-    case 4:
-      return <ReviewSubmit formData={formData} prevStep={prevStep} handleSubmit={handleSubmit} />;
-    default:
-      return null;
-  }
+  return (
+    <Container maxWidth="sm">
+      <Box sx={{ width: '100%', mt: 4 }}>
+        <Stepper activeStep={step - 1} alternativeLabel>
+          {steps.map(label => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+      </Box>
+      {submitted ? (
+        <Paper elevation={3} sx={{ mt: 8, p: 5, borderRadius: 3, textAlign: 'center' }}>
+          <Typography variant="h4" color="primary" gutterBottom>Thank you for submitting!</Typography>
+          <Typography variant="subtitle1">Your details have been received.</Typography>
+        </Paper>
+      ) : (
+        <>
+          {step === 1 && <Step1 formData={formData} setFormData={setFormData} nextStep={nextStep} />}
+          {step === 2 && <Step2 formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />}
+          {step === 3 && <Step3 formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />}
+          {step === 4 && <ReviewSubmit formData={formData} prevStep={prevStep} handleSubmit={handleSubmit} />}
+        </>
+      )}
+    </Container>
+  );
 }
 
 export default App;
