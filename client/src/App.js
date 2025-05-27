@@ -362,15 +362,14 @@ function Step3({ formData, setFormData, nextStep, prevStep }) {
 
 function ReviewSubmit({ formData, prevStep, handleSubmit }) {
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(null);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
   const onSubmit = async () => {
-    setSuccess(true); // Show success immediately
     setLoading(true);
     setError('');
+    setSuccess(false);
     try {
-      // Prepare form data for sending (handle file if present)
       let body;
       let headers = {};
       if (formData.photo) {
@@ -379,21 +378,28 @@ function ReviewSubmit({ formData, prevStep, handleSubmit }) {
           if (key === 'photo' && value) body.append('photo', value);
           else if (key !== 'photoPreview') body.append(key, value);
         });
-        // No need to set Content-Type for FormData
       } else {
         body = { ...formData };
         delete body.photoPreview;
         headers['Content-Type'] = 'application/json';
         body = JSON.stringify(body);
       }
-      // Send to backend in background
-      fetch('/submit-profile', {
-        method: 'POST',
-        body,
-        headers,
-      });
+      // Use relative URL for proxy or absolute for production
+      const response = await fetch(
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:5000/submit-profile'
+          : '/submit-profile',
+        {
+          method: 'POST',
+          body,
+          headers,
+        }
+      );
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Submission failed');
+      setSuccess(true);
     } catch (err) {
-      // Optionally handle errors
+      setError(err.message || 'Submission failed');
     } finally {
       setLoading(false);
     }
